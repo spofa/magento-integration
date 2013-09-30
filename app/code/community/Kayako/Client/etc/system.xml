@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+	<tabs>
+		<client translate="label" module="client">
+			<label>Kayako Configuration</label>
+			<sort_order>500</sort_order>
+		</client>
+	</tabs>
+
+	<sections>
+		<client module="client" translate="label">
+			<label>Settings</label>
+			<!-- Name of the submenu in the 'Custom Configuration' tab -->
+			<sort_order>100</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>1</show_in_website>
+			<!-- Whether to show the options on website page -->
+			<show_in_store>1</show_in_store>
+			<!-- Whether to show the options on store page -->
+			<tab>client</tab>
+		</client>
+
+		<client>
+			<groups>
+				<settings translate="label" module="client">
+					<label>Settings</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>1000</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<api_key translate="label">
+							<label>API Key:</label>
+							<comment>This is the Unique Key that identifies your application.</comment>
+							<frontend_type>text</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<validate>required-entry</validate>
+						</api_key>
+
+						<secret_key translate="label">
+							<label>Secret Key:</label>
+							<comment>The Secret Key is used to sign all the requests dispatched to Fusion. This is like a password and should be kept in a secure place.</comment>
+							<frontend_type>text</frontend_type>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<validate>required-entry</validate>
+						</secret_key>
+
+						<api_url translate="label">
+							<label>API URL:</label>
+							<comment>This is the URL you should dispatch all GET, POST, PUT and DELETE requests to.</comment>
+							<frontend_type>text</frontend_type>
+							<sort_order>30</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<validate>required-entry</validate>
+						</api_url>
+					</fields>
+				</settings>
+			</groups>
+		</client>
+	</sections>
+
+</config>

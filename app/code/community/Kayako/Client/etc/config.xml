@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<modules>
+		<Kayako_Client> <!-- your namespace and module name. spell/case it right. -->
+			<version>0.1.0</version>
+			<!-- the version of your module, unimportant unless dealing with custom sql -->
+		</Kayako_Client>
+	</modules>
+
+	<frontend>
+		<routers>
+			<client> <!-- name of router. for consistency sake, match this to frontName -->
+				<use>standard</use>
+				<!-- this is a standard router -->
+				<args>
+					<module>Kayako_Client</module>
+					<!-- what module we should look at for the 'client' router -->
+					<frontName>client</frontName>
+					<!-- for consistency sake, match this to router name -->
+				</args>
+			</client>
+		</routers>
+
+		<layout>
+			<updates>
+				<client>
+					<file>client.xml</file>
+				</client>
+			</updates>
+		</layout>
+
+	</frontend>
+
+	<global>
+
+		<blocks>
+			<client>
+				<class>Kayako_Client_Block</class>
+			</client>
+		</blocks>
+
+		<helpers>
+			<client>
+				<class>Kayako_Client_Helper</class>
+			</client>
+		</helpers>
+
+		<models>
+			<client>
+				<class>Kayako_Client_Model</class>
+			</client>
+		</models>
+
+	</global>
+
+	<adminhtml>
+		<acl>
+			<resources>
+				<all>
+					<title>Allow Everything</title>
+				</all>
+				<admin>
+					<children>
+						<system>
+							<children>
+								<config>
+									<children>
+										<client>
+											<title>Client - All</title>
+										</client>
+									</children>
+								</config>
+							</children>
+						</system>
+					</children>
+				</admin>
+			</resources>
+		</acl>
+	</adminhtml>
+</config>

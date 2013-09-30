@@ -1,0 +1,17 @@
+#######################################################
+ Kayako™
+
+ Magento module
+ #######################################################
+
+INSTALLATION:
+
+IMPORTANT: If you use Magento Compiler, disable it. After installation is complete, go to Magento Compiler and run the compilation process.
+
+1. Unzip the contents and upload the app and lib folders to your Magento directory.
+
+2. Go to 'System -> Cache Management' and refresh the cache.
+
+3. Configure the Kayako™ module through the 'System -> Configuration' menu in the Magento admin panel.
+
+4. Kayako is ready to use!
