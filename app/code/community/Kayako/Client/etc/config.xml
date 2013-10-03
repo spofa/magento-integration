@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<modules>
-		<Kayako_Client> <!-- your namespace and module name. spell/case it right. -->
-			<version>0.1.0</version>
-			<!-- the version of your module, unimportant unless dealing with custom sql -->
+		<Kayako_Client>
+			<version>1.0.2</version>
 		</Kayako_Client>
 	</modules>
 
 	<frontend>
 		<routers>
-			<client> <!-- name of router. for consistency sake, match this to frontName -->
+			<client>
 				<use>standard</use>
-				<!-- this is a standard router -->
 				<args>
 					<module>Kayako_Client</module>
-					<!-- what module we should look at for the 'client' router -->
 					<frontName>client</frontName>
-					<!-- for consistency sake, match this to router name -->
 				</args>
 			</client>
 		</routers>
