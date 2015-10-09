@@ -1,17 +1,27 @@
-#######################################################
- Kayako™
+Kayako Magento Integration
+=======================
 
- Magento module
- #######################################################
+This library is maintained by Kayako.
 
-INSTALLATION:
+Overview
+=======================
 
-IMPORTANT: If you use Magento Compiler, disable it. After installation is complete, go to Magento Compiler and run the compilation process.
+Magento module with Kayako will help users to get support within website.
+Users can create ticket, view their submitted ticket details.
+They update ticket status and can post their reply for respective ticket within their magento website.
 
-1. Unzip the contents and upload the app and lib folders to your Magento directory.
+Features
+=======================
 
-2. Go to 'System -> Cache Management' and refresh the cache.
+Facilitate users within website to create their own tickets.
+Users can see list of their all submitted tickets.
+User can see ticket with its all related posts up to till date.
+User can update status and priority of ticket as per the need.
+Users can post their reply to follow up with their tickets.
+Magento users can login to helpdesk via Loginshare.
 
-3. Configure the Kayako™ module through the 'System -> Configuration' menu in the Magento admin panel.
+Supported versions
+=======================
 
-4. Kayako is ready to use!
+Kayako: v4.51.1891 and above
+Magento: 1.7.0.2 and above
