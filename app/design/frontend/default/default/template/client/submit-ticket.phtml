@@ -15,7 +15,7 @@
 						?>
 						<li class="control">
 							<input type="radio" class="radio <?php echo(($i == count($this->departments)) ? 'validate-one-required-by-name' : ''); ?>"
-							       id="department_<?php echo $department->getID(); ?>" name="department" value="<?php echo $department->getID(); ?>">
+								   id="department_<?php echo $department->getID(); ?>" name="department" value="<?php echo $department->getID(); ?>">
 							<label for="department_<?php echo $department->getID(); ?>"><?php echo $department->getTitle(); ?></label>
 						</li>
 					<?php

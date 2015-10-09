@@ -133,6 +133,53 @@ abstract class kyObjectBase {
 		return array();
 	}
 
+	/**
+	 * Adds numeric field to object data array only if its value is proper number.
+	 *
+	 * @param array $data Data used to create or update the object.
+	 * @param string $field_name Field name.
+	 * @param mixed $field_value Field value.
+	 */
+	protected function buildDataNumeric(&$data, $field_name, $field_value) {
+		if (is_numeric($field_value))
+			$data[$field_name] = $field_value;
+	}
+
+	/**
+	 * Adds string field to object data array only if its value is non-empty.
+	 *
+	 * @param array $data Data used to create or update the object.
+	 * @param string $field_name Field name.
+	 * @param mixed $field_value Field value.
+	 */
+	protected function buildDataString(&$data, $field_name, $field_value) {
+		if (strlen($field_value) > 0)
+			$data[$field_name] = $field_value;
+	}
+
+	/**
+	 * Adds boolean field to object data array only if its value is non-empty.
+	 *
+	 * @param array $data Data used to create or update the object.
+	 * @param string $field_name Field name.
+	 * @param mixed $field_value Field value.
+	 */
+	protected function buildDataBool(&$data, $field_name, $field_value) {
+		if ($field_value !== null)
+			$data[$field_name] = $field_value ? 1 : 0;
+	}
+
+	/**
+	 * Adds array field to object data array only if its value is proper array and is non-empty.
+	 *
+	 * @param array $data Data used to create or update the object.
+	 * @param string $field_name Field name.
+	 * @param mixed $field_value Field value.
+	 */
+	protected function buildDataList(&$data, $field_name, $field_value) {
+		if (is_array($field_value) && count($field_value) > 0)
+			$data[$field_name] = implode(',', $field_value);
+	}
 
 	/**
 	 * Returns whether the object is new and not yet saved on the server.
@@ -233,41 +280,41 @@ abstract class kyObjectBase {
 		/**
 		 * Clear all object properties.
 		 */
-   	    foreach ($this as $key => $value) {
-           	$this->$key = null;
-       	}
+   		foreach ($this as $key => $value) {
+		   	$this->$key = null;
+	   	}
 
 		$this->parseData($result[static::$object_xml_name][0]);
 		return $this;
 	}
 
-    /**
-     * Creates an object on the server and refreshes its local data.
-     *
-     * @throws BadMethodCallException
-     * @throws kyException
-     * @return kyObjectBase
-     */
+	/**
+	 * Creates an object on the server and refreshes its local data.
+	 *
+	 * @throws BadMethodCallException
+	 * @throws kyException
+	 * @return kyObjectBase
+	 */
 	public function create() {
 		if ($this->read_only)
 			throw new BadMethodCallException(sprintf("You can't create new objects of type %s.", get_called_class()));
 
 		$result = self::getRESTClient()->post(static::$controller, array(), $this->buildData(true));
 
-        if (count($result) === 0)
-            throw new kyException("No data returned by the server after creating the object.");
+		if (count($result) === 0)
+			throw new kyException("No data returned by the server after creating the object.");
 
 		$this->parseData($result[static::$object_xml_name][0]);
 		return $this;
 	}
 
-    /**
-     * Updates the object on the server and refreshes its local data.
-     *
-     * @throws BadMethodCallException
-     * @throws kyException
-     * @return kyObjectBase
-     */
+	/**
+	 * Updates the object on the server and refreshes its local data.
+	 *
+	 * @throws BadMethodCallException
+	 * @throws kyException
+	 * @return kyObjectBase
+	 */
 	public function update() {
 		if ($this->read_only)
 			throw new BadMethodCallException(sprintf("You can't update objects of type %s.", get_called_class()));
@@ -277,10 +324,10 @@ abstract class kyObjectBase {
 
 		$result = self::getRESTClient()->put(static::$controller, $this->getId(true), $this->buildData(false));
 
-        if (count($result) === 0)
-            throw new kyException("No data returned by the server after updating the object.");
+		if (count($result) === 0)
+			throw new kyException("No data returned by the server after updating the object.");
 
-        $this->parseData($result[static::$object_xml_name][0]);
+		$this->parseData($result[static::$object_xml_name][0]);
 		return $this;
 	}
 
@@ -311,7 +358,7 @@ abstract class kyObjectBase {
 	 * Builds API fields list.
 	 *
 	 * Scans protected and private properties of called class, searches for
-	 * @apiField [name=field name] [accessor=setter/getter name] [getter=getter name] [setter=setter name] [required_create=true if field if required when creating object] [required_update=true if field if required when udpating object] [required=true if field if required when creating or updating object]
+	 * @apiField [name=field name]{0,1} [alias=field name alias]* [accessor=setter/getter name]{0,1} [getter=getter name]{0,1} [setter=setter name]{0,1} [required_create=true if field if required when creating object]{0,1} [required_update=true if field if required when udpating object]{0,1} [required=true if field if required when creating or updating object]{0,1}
 	 * and builds API field list with property name, description, setter and getter method names, and required flags.
 	 * @see kyObjectBase::$_api_fields
 	 */
@@ -324,7 +371,8 @@ abstract class kyObjectBase {
 			foreach ($class->getProperties(ReflectionProperty::IS_PROTECTED|ReflectionProperty::IS_PUBLIC) as $property) {
 				/* @var $property ReflectionProperty */
 				$comment = $property->getDocComment();
-				$short_description = trim(next(explode("\n", $comment)), " *\t\n\r");
+				$comment_lines = explode("\n", $comment);
+				$short_description = trim(next($comment_lines), " *\t\n\r");
 
 				$parameters = ky_get_tag_parameters($comment, 'apiField');
 				if ($parameters === false)

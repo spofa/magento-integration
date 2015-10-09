@@ -1,7 +1,7 @@
 <?php
-$ticketDetails = $this->getData('ticketDetails');
+$ticketDetails     = $this->getData('ticketDetails');
 $ticketPostDetails = $this->getData('ticketPostDetails');
-$ticketStatusList = $this->getData('ticketStatusList');
+$ticketStatusList  = $this->getData('ticketStatusList');
 
 echo $this->getMessagesBlock()->getGroupedHtml()
 ?>
@@ -73,7 +73,7 @@ echo $this->getMessagesBlock()->getGroupedHtml()
 
 			<div class="fieldset" style="display: none;" id="postContentContainer">
 				<form id="messageDetailForm" name="messageDetailForm" method="post"
-				      action="<?php echo Mage::getUrl('*/*/postReply', array('tid' => $ticketDetails['ticketid'])); ?>">
+					  action="<?php echo Mage::getUrl('*/*/postReply', array('tid' => $ticketDetails['ticketid'])); ?>">
 					<h2 class="legend"><?php echo Mage::helper('client')->__('Message Details') ?></h2>
 					<ul class="form-list">
 						<li class="wide">

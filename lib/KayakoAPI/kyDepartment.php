@@ -341,7 +341,7 @@ class kyDepartment extends kyObjectBase {
 	}
 
 	/**
-	 * Returns identifiers of user groups that can be assigned to this department.
+	 * Returns identifiers of user groups that this department will be visible to.
 	 *
 	 * @return array
 	 * @filterBy name=UserGroupId
@@ -351,9 +351,9 @@ class kyDepartment extends kyObjectBase {
 	}
 
 	/**
-	 * Sets user groups that can be assigned to this department using their identifiers.
+	 * Sets user groups (using their identifiers) that this department will be visible to.
 	 *
-	 * @param int[] $user_group_ids Identifiers of user groups that can be assigned to this department.
+	 * @param int[] $user_group_ids Identifiers of user groups that this department will be visible to.
 	 * @return kyDepartment
 	 */
 	public function setUserGroupIds($user_group_ids) {
@@ -380,7 +380,7 @@ class kyDepartment extends kyObjectBase {
 	}
 
 	/**
-	 * Returns user groups that can be assigned to this department.
+	 * Returns user groups that this department will be visible to.
 	 * Result is cached until the end of script.
 	 *
 	 * @param bool $reload True to reload data from server. False to use the cached value (if present).
@@ -392,6 +392,13 @@ class kyDepartment extends kyObjectBase {
 				$this->user_groups[$user_group_id] = kyUserGroup::get($user_group_id);
 			}
 		}
+
+		foreach ($this->user_groups as $user_group_id => $user_group) {
+			if (!in_array($user_group_id, $this->user_group_ids)) {
+				unset($this->user_groups[$user_group_id]);
+			}
+		}
+
 		return new kyResultSet(array_values($this->user_groups));
 	}
 
@@ -419,10 +426,10 @@ class kyDepartment extends kyObjectBase {
 	}
 
 	/**
-	 * Add user group to the list of groups that can be assigned to this department.
+	 * Add user group to the list of groups that this department will be visible to.
 	 * Automatically sets custom user visibility flag to True.
 	 *
-	 * @param kyUserGroup $user_group User group that can be assigned to this department.
+	 * @param kyUserGroup $user_group User group that this department will be visible to.
 	 * @param bool $clear Clear the list before adding.
 	 * @return kyDepartment
 	 */
@@ -432,12 +439,11 @@ class kyDepartment extends kyObjectBase {
 			$this->user_group_ids = array();
 		}
 
-		//do nothing if it's already present
-		if (in_array($user_group->getId(), $this->user_group_ids))
-			return $this;
-
-		$this->user_group_ids[] = $user_group->getId();
-		$this->user_visibility_custom = true;
+		if (!in_array($user_group->getId(), $this->user_group_ids)) {
+			$this->user_group_ids[] = $user_group->getId();
+			$this->user_groups[$user_group->getId()] = $user_group;
+			$this->user_visibility_custom = true;
+		}
 
 		return $this;
 	}

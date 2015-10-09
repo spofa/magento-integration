@@ -30,8 +30,8 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	const CREATION_MODE_API = 4;
 	const CREATION_MODE_SITEBADGE = 5;
 
-	const CREATION_TYPE_DEFAULT = 1;
-	const CREATION_TYPE_PHONE = 2;
+	const CREATION_TYPE_DEFAULT = 'default';
+	const CREATION_TYPE_PHONE = 'phone';
 
 	/**
 	 * Flag for searching using query - search the Ticket ID & Mask ID.
@@ -403,12 +403,12 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 */
 	protected $contents = null;
 
-    /**
-     * Option to disable autoresponder e-mail.
-     * @apiField
-     * @var bool
-     */
-    protected $ignore_auto_responder = false;
+	/**
+	 * Option to disable autoresponder e-mail.
+	 * @apiField
+	 * @var bool
+	 */
+	protected $ignore_auto_responder = false;
 
 	/**
 	 * Ticket status.
@@ -535,7 +535,9 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 		$this->is_escalated = ky_assure_bool($data['isescalated']);
 		$this->escalation_rule_id = ky_assure_positive_int($data['escalationruleid']);
 		$this->template_group_id = ky_assure_positive_int($data['templategroupid']);
-		$this->template_group_name = $data['templategroupname'];
+		if (is_numeric($data['templategroupid']) && !empty($data['templategroupid']) && isset($data['templategroupname'])) {
+			$this->template_group_name = $data['templategroupname'];
+		}
 		$this->tags = $data['tags'];
 
 		$this->watchers = array();
@@ -627,7 +629,7 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 
 			$data['contents'] = $this->contents;
 			$data['type'] = $this->creation_type;
-            $data['ignoreautoresponder'] = $this->ignore_auto_responder;
+			$data['ignoreautoresponder'] = $this->ignore_auto_responder;
  		} else {
  			$data['userid'] = $this->user_id;
  		}
@@ -642,10 +644,12 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * @param array|kyResultSet|kyTicketStatus $ticket_statuses List of ticket status identifiers.
 	 * @param array|kyResultSet|kyStaff $owner_staffs List of staff (ticket owners) identifiers.
 	 * @param array|kyResultSet|kyUser $users List of user (ticket creators) identifiers.
+	 * @param $rowsPerPage (OPTIONAL)
+	 * @param $rowOffset (OPTIONAL)
 	 * @throws InvalidArgumentException
 	 * @return kyResultSet
 	 */
-	static public function getAll($departments, $ticket_statuses = array(), $owner_staffs = array(), $users = array()) {
+	static public function getAll($departments, $ticket_statuses = array(), $owner_staffs = array(), $users = array(), $max_items = null, $starting_ticket_id = null) {
 		$search_parameters = array('ListAll');
 
 		$department_ids = array();
@@ -699,6 +703,14 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 			$search_parameters[] = implode(',', $user_ids);
 		else
 			$search_parameters[] = '-1';
+
+		if (is_numeric($starting_ticket_id) && $starting_ticket_id > 0) {
+			if (!is_numeric($max_items) || $max_items <= 0) {
+				$max_items = 1000;
+			}
+			$search_parameters[] = $max_items;
+			$search_parameters[] = $starting_ticket_id;
+		}
 
 		return parent::getAll($search_parameters);
 	}
@@ -1330,6 +1342,9 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * @orderBy
 	 */
 	public function getCreationTime($format = null) {
+		if ($this->creation_time == null)
+			return null;
+
 		if ($format === null) {
 			$format = kyConfig::get()->getDatetimeFormat();
 		}
@@ -1348,6 +1363,9 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * @orderBy
 	 */
 	public function getLastActivity($format = null) {
+		if ($this->last_activity == null)
+			return null;
+
 		if ($format === null) {
 			$format = kyConfig::get()->getDatetimeFormat();
 		}
@@ -1366,7 +1384,7 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * @orderBy
 	 */
 	public function getLastStaffReply($format = null) {
-		if ($this->last_staff_reply == 0)
+		if ($this->last_staff_reply == null)
 			return null;
 
 		if ($format === null) {
@@ -1387,7 +1405,7 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * @orderBy
 	 */
 	public function getLastUserReply($format = null) {
-		if ($this->last_user_reply == 0)
+		if ($this->last_user_reply == null)
 			return null;
 
 		if ($format === null) {
@@ -1418,7 +1436,7 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * @orderBy
 	 */
 	public function getNextReplyDue($format = null) {
-		if ($this->next_reply_due == 0)
+		if ($this->next_reply_due == null)
 			return null;
 
 		if ($format === null) {
@@ -1439,7 +1457,7 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * @orderBy
 	 */
 	public function getResolutionDue($format = null) {
-		if ($this->resolution_due == 0)
+		if ($this->resolution_due == null)
 			return null;
 
 		if ($format === null) {
@@ -1567,14 +1585,14 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 
 	/**
 	 * Sets the template group identifier.
-     * Resets template group name.
+	 * Resets template group name.
 	 *
 	 * @param int $template_group_id Template group identifier.
 	 * @return kyTicket
 	 */
 	public function setTemplateGroupId($template_group_id) {
 		$this->template_group_id = ky_assure_positive_int($template_group_id);
-        $this->template_group_name = null;
+		$this->template_group_name = null;
 		return $this;
 	}
 
@@ -1591,14 +1609,14 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 
 	/**
 	 * Sets the template group name.
-     * Resets template group identifier.
+	 * Resets template group identifier.
 	 *
 	 * @param string $template_group_name Template group name.
 	 * @return kyTicket
 	 */
 	public function setTemplateGroupName($template_group_name) {
 		$this->template_group_name = ky_assure_string($template_group_name);
-        $this->template_group_id = null;
+		$this->template_group_id = null;
 		return $this;
 	}
 
@@ -1609,24 +1627,24 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * @return kyTicket
 	 */
 	public function setTemplateGroup($template_group_id_or_name) {
-        if (is_numeric($template_group_id_or_name)) {
-            $this->setTemplateGroupId($template_group_id_or_name);
-        } else {
-            $this->setTemplateGroupName($template_group_id_or_name);
-        }
+		if (is_numeric($template_group_id_or_name)) {
+			$this->setTemplateGroupId($template_group_id_or_name);
+		} else {
+			$this->setTemplateGroupName($template_group_id_or_name);
+		}
 		return $this;
 	}
 
-    /**
-     * Sets whether to ignore (disable) autoresponder e-mail.
-     *
-     * @param bool $ignore_auto_responder Whether to ignore (disable) autoresponder e-mail.
-     * @return kyTicket
-     */
-    public function setIgnoreAutoResponder($ignore_auto_responder) {
-        $this->ignore_auto_responder = ky_assure_bool($ignore_auto_responder);
-        return $this;
-    }
+	/**
+	 * Sets whether to ignore (disable) autoresponder e-mail.
+	 *
+	 * @param bool $ignore_auto_responder Whether to ignore (disable) autoresponder e-mail.
+	 * @return kyTicket
+	 */
+	public function setIgnoreAutoResponder($ignore_auto_responder) {
+		$this->ignore_auto_responder = ky_assure_bool($ignore_auto_responder);
+		return $this;
+	}
 
 	/**
 	 * Returns tickets watchers.
@@ -1634,8 +1652,8 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * <pre>
 	 * array(
 	 *   array(
-	 *     'staff_id' => <staff identifier>,
-	 *     'name' => '<staff full name>'
+	 *	 'staff_id' => <staff identifier>,
+	 *	 'name' => '<staff full name>'
 	 *   ),
 	 *   ...
 	 * )
@@ -1653,8 +1671,8 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * <pre>
 	 * array(
 	 *   array(
-	 *     'id' => <workflow identifier>,
-	 *     'title' => '<workflow title>'
+	 *	 'id' => <workflow identifier>,
+	 *	 'title' => '<workflow title>'
 	 *   ),
 	 *   ...
 	 * )
@@ -1863,7 +1881,7 @@ class kyTicket extends kyObjectWithCustomFieldsBase {
 	 * 						'total_unresolved_items' => <total amount of unresolved tickets of this type in this department>,
 	 * 					),
 	 * 					...,
-	 * 					'unknown' => array(  //in Kayako 4.01.204 all ticket types will be unknown beacuse of a bug (http://dev.kayako.com/browse/SWIFT-1465)
+	 * 					'unknown' => array(  //in Kayako 4.01.204 all ticket types will be unknown because of a bug (http://dev.kayako.com/browse/SWIFT-1465)
 	 * 						...
 	 * 					)
 	 * 				)
